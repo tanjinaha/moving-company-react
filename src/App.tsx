@@ -1,4 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import OrderList from "./components/OrderList"; // Adjust path if needed
+import CustomerList from "./components/CustomerList"; 
+import SalesConsultantList from "./components/SalesConsultantList";
+import ServiceTypeList from "./components/ServiceTypeList";
+
 // Import React Router components to manage navigation and routes
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
@@ -25,16 +30,16 @@ function Home() {
 
 // Placeholder components for other pages — to be replaced with real components later
 function Customers() {
-  return <h2 className="p-8">Customers List Page (to be built)</h2>;
+  return <CustomerList/>;
 }
 function Orders() {
-  return <h2 className="p-8">Orders List Page (to be built)</h2>;
+  return <OrderList/>;
 }
 function SalesConsultants() {
-  return <h2 className="p-8">Sales Consultants List Page (to be built)</h2>;
+  return <SalesConsultantList/>;
 }
 function ServiceTypes() {
-  return <h2 className="p-8">Service Types List Page (to be built)</h2>;
+  return <ServiceTypeList/>;
 }
 
 // Main App component wraps everything inside Router for routing to work
