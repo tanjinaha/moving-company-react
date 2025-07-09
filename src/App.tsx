@@ -1,35 +1,60 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from "react";
+// Import React Router components to manage navigation and routes
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+// Home component serves as the landing page with navigation links
+function Home() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="p-8">
+      {/* Main heading for the app */}
+      <h1 className="text-3xl font-bold mb-6">Welcome to Moving Company App</h1>
+      {/* Navigation links styled with Tailwind CSS */}
+      <nav className="space-y-4">
+        {/* 
+          Link component creates a client-side navigation link.
+          It prevents full page reloads and changes URL using HTML5 history API.
+        */}
+        <Link to="/customers" className="block text-blue-600 underline">Customers</Link>
+        <Link to="/orders" className="block text-blue-600 underline">Orders</Link>
+        <Link to="/sales-consultants" className="block text-blue-600 underline">Sales Consultants</Link>
+        <Link to="/service-types" className="block text-blue-600 underline">Service Types</Link>
+      </nav>
+    </div>
+  );
 }
 
-export default App
+// Placeholder components for other pages — to be replaced with real components later
+function Customers() {
+  return <h2 className="p-8">Customers List Page (to be built)</h2>;
+}
+function Orders() {
+  return <h2 className="p-8">Orders List Page (to be built)</h2>;
+}
+function SalesConsultants() {
+  return <h2 className="p-8">Sales Consultants List Page (to be built)</h2>;
+}
+function ServiceTypes() {
+  return <h2 className="p-8">Service Types List Page (to be built)</h2>;
+}
+
+// Main App component wraps everything inside Router for routing to work
+export default function App() {
+  return (
+    // Router enables client-side routing in React app
+    <Router>
+      {/* Routes component defines all route paths and corresponding components */}
+      <Routes>
+        {/* Route for Home page */}
+        <Route path="/" element={<Home />} />
+        {/* Route for Customers page */}
+        <Route path="/customers" element={<Customers />} />
+        {/* Route for Orders page */}
+        <Route path="/orders" element={<Orders />} />
+        {/* Route for Sales Consultants page */}
+        <Route path="/sales-consultants" element={<SalesConsultants />} />
+        {/* Route for Service Types page */}
+        <Route path="/service-types" element={<ServiceTypes />} />
+      </Routes>
+    </Router>
+  );
+}
