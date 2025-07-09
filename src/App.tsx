@@ -3,6 +3,7 @@ import OrderList from "./components/OrderList"; // Adjust path if needed
 import CustomerList from "./components/CustomerList"; 
 import SalesConsultantList from "./components/SalesConsultantList";
 import ServiceTypeList from "./components/ServiceTypeList";
+import PlaceOrderForm from "./components/PlaceOrderForm"; // Adjust path if needed
 
 // Import React Router components to manage navigation and routes
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
@@ -49,6 +50,7 @@ export default function App() {
     <Router>
       {/* Routes component defines all route paths and corresponding components */}
       <Routes>
+        <Route path="/place-order" element={<PlaceOrderForm />} />
         {/* Route for Home page */}
         <Route path="/" element={<Home />} />
         {/* Route for Customers page */}
