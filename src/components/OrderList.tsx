@@ -10,13 +10,19 @@ interface Order {
 
 // OrdersList component fetches and shows the orders
 export default function OrdersList() {
-  
+
   // State to store fetched orders
   const [orders, setOrders] = useState<Order[]>([]);
   // State for loading indicator
   const [loading, setLoading] = useState(true);
   // State for error messages
   const [error, setError] = useState<string | null>(null);
+
+  // Keep track of which order is being edited (null means none)
+  const [editingOrderId, setEditingOrderId] = useState<number | null>(null);
+
+  // Track updated note (for editing)
+  const [editedNote, setEditedNote] = useState<string>("");
 
   // useEffect runs once after the component mounts
   useEffect(() => {
@@ -42,6 +48,44 @@ export default function OrdersList() {
 
   // Show error if fetch failed
   if (error) return <div className="p-4 text-red-600">Error: {error}</div>;
+  function handleUpdate(orderId: number) {
+    // Build the updated order object (only note in this case)
+    const updatedOrder = {
+      orderId: orderId,
+      customerId: orders.find(o => o.orderId === orderId)?.customerId,
+      consultantId: orders.find(o => o.orderId === orderId)?.consultantId,
+      note: editedNote,
+    };
+
+    fetch(`http://localhost:8080/orders/${orderId}`, {
+      method: "PUT", // or PUT if your backend uses that
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedOrder),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to update order");
+        }
+        return res.json();
+      })
+      .then((updated) => {
+        // Update the order in the local list
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order.orderId === orderId ? { ...order, note: editedNote } : order
+          )
+        );
+
+        // Reset editing state
+        setEditingOrderId(null);
+        setEditedNote("");
+      })
+      .catch((err) => {
+        alert("Error updating order: " + err.message);
+      });
+  }
 
   // Render list of orders
   return (
@@ -57,6 +101,36 @@ export default function OrdersList() {
             <p><strong>Customer ID:</strong> {order.customerId}</p>
             <p><strong>Consultant ID:</strong> {order.consultantId}</p>
             {order.note && <p><strong>Note:</strong> {order.note}</p>}
+
+            <button
+              className="mt-2 px-3 py-1 bg-yellow-400 rounded text-white hover:bg-yellow-500"
+              onClick={() => {
+                setEditingOrderId(order.orderId);       // Start editing this order
+                setEditedNote(order.note || "");        // Fill input with current note (or empty if null)
+              }}
+            >
+              Edit
+            </button>
+
+            {/* Show input + save button ONLY when editing this order */}
+            {editingOrderId === order.orderId && (
+              <div className="mt-2 space-y-2">
+                <input
+                  type="text"
+                  className="w-full border p-2 rounded"
+                  value={editedNote}
+                  onChange={(e) => setEditedNote(e.target.value)}
+                  placeholder="Update note"
+                />
+                <button
+                  className="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700"
+                  onClick={() => handleUpdate(order.orderId)}  // We will write this function next
+                >
+                  Save
+                </button>
+              </div>
+            )}
+
           </li>
         ))}
       </ul>
