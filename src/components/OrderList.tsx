@@ -50,12 +50,19 @@ export default function OrdersList() {
   if (error) return <div className="p-4 text-red-600">Error: {error}</div>;
   function handleUpdate(orderId: number) {
     // Build the updated order object (only note in this case)
-    const updatedOrder = {
-      orderId: orderId,
-      customerId: orders.find(o => o.orderId === orderId)?.customerId,
-      consultantId: orders.find(o => o.orderId === orderId)?.consultantId,
-      note: editedNote,
-    };
+    const existingOrder = orders.find(o => o.orderId === orderId);
+
+if (!existingOrder) {
+  alert("Order not found");
+  return;
+}
+
+const updatedOrder = {
+  orderId: existingOrder.orderId,
+  customerId: existingOrder.customerId,
+  consultantId: existingOrder.consultantId,
+  note: editedNote,
+};
 
     fetch(`http://localhost:8080/orders/${orderId}`, {
       method: "PUT", // or PUT if your backend uses that
@@ -85,7 +92,27 @@ export default function OrdersList() {
       .catch((err) => {
         alert("Error updating order: " + err.message);
       });
+  } function handleDelete(orderId: number) {
+    const confirmDelete = window.confirm("Are you sure you want to delete this order?");
+    if (!confirmDelete) return;
+
+    fetch(`http://localhost:8080/orders/${orderId}`, {
+      method: "DELETE",
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to delete order");
+        }
+        setOrders((prevOrders) =>
+          prevOrders.filter((order) => order.orderId !== orderId)
+        );
+        setEditingOrderId(null);
+      })
+      .catch((err) => {
+        alert("Error deleting order: " + err.message);
+      });
   }
+
 
   // Render list of orders
   return (
@@ -128,6 +155,17 @@ export default function OrdersList() {
                 >
                   Save
                 </button>
+
+                {/*  NEW Delete button */}
+                <button
+                  className="bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700"
+                  onClick={() => handleDelete(order.orderId)}
+                >
+                  Delete
+                </button>
+
+
+
               </div>
             )}
 
