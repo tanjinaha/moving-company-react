@@ -52,17 +52,17 @@ export default function OrdersList() {
     // Build the updated order object (only note in this case)
     const existingOrder = orders.find(o => o.orderId === orderId);
 
-if (!existingOrder) {
-  alert("Order not found");
-  return;
-}
+    if (!existingOrder) {
+      alert("Order not found");
+      return;
+    }
 
-const updatedOrder = {
-  orderId: existingOrder.orderId,
-  customerId: existingOrder.customerId,
-  consultantId: existingOrder.consultantId,
-  note: editedNote,
-};
+    const updatedOrder = {
+      orderId: existingOrder.orderId,
+      customerId: existingOrder.customerId,
+      consultantId: existingOrder.consultantId,
+      note: editedNote,
+    };
 
     fetch(`http://localhost:8080/orders/${orderId}`, {
       method: "PUT", // or PUT if your backend uses that
@@ -139,6 +139,13 @@ const updatedOrder = {
               Edit
             </button>
 
+            <button
+              className="mt-2 ml-2 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+               onClick={() => handleDelete(order.orderId)}
+            >
+              Delete
+            </button>
+
             {/* Show input + save button ONLY when editing this order */}
             {editingOrderId === order.orderId && (
               <div className="mt-2 space-y-2">
@@ -157,12 +164,7 @@ const updatedOrder = {
                 </button>
 
                 {/*  NEW Delete button */}
-                <button
-                  className="bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700"
-                  onClick={() => handleDelete(order.orderId)}
-                >
-                  Delete
-                </button>
+                
 
 
 

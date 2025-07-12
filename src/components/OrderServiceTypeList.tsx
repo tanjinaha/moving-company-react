@@ -39,17 +39,30 @@ export default function OrderServiceTypeList() {
   return (
     <div>
       <h2>Order ↔ Service Type List</h2>
-      <ul>
-        {rows.map(r => (
-          <li key={r.orderServiceTypeId}>
-            ID: {r.orderServiceTypeId} — Order: #{r.orderId} — Service: #{r.serviceId}
-            {r.fromAddress && <> — From: {r.fromAddress}</>}
-            {r.toAddress && <> — To: {r.toAddress}</>}
-            {r.scheduleDate && <> — Date: {r.scheduleDate}</>}
-            {r.price && <> — Price: {r.price}</>}
-          </li>
-        ))}
-      </ul>
+      <table className="min-w-full border mt-4">
+  <thead>
+    <tr className="bg-gray-200">
+      <th className="border p-2">Order ID</th>
+      <th className="border p-2">Service ID</th>
+      <th className="border p-2">From</th>
+      <th className="border p-2">To</th>
+      <th className="border p-2">Schedule Date</th>
+      <th className="border p-2">Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    {rows.map(r => (
+      <tr key={r.orderServiceTypeId}>
+        <td className="border p-2">{r.orderId}</td>
+        <td className="border p-2">{r.serviceId}</td>
+        <td className="border p-2">{r.fromAddress || "-"}</td>
+        <td className="border p-2">{r.toAddress || "-"}</td>
+        <td className="border p-2">{r.scheduleDate || "-"}</td>
+        <td className="border p-2">{r.price || "-"}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
     </div>
   );
 }
