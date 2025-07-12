@@ -43,6 +43,24 @@ export default function OrderOverviewPage() {
     const [orderServiceTypes, setOrderServiceTypes] = useState<OrderServiceType[]>([]);
     const [serviceTypes, setServiceTypes] = useState<{ serviceId: number; serviceName: string }[]>([]);
 
+    // ⬇️ ✅ Paste here:
+    const [newOrder, setNewOrder] = useState<Order>({
+        orderId: 0,
+        customerId: customers[0]?.customerId ?? 0,
+        consultantId: consultants[0]?.consultantId ?? 0,
+        note: ""
+    });
+
+    const [newOrderService, setNewOrderService] = useState<OrderServiceType>({
+        orderServiceTypeId: 0,
+        orderId: 0,
+        serviceId: serviceTypes[0]?.serviceId ?? 0,
+        fromAddress: "",
+        toAddress: "",
+        scheduleDate: "",
+        price: 0
+    });
+
     // Loading and error state
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -105,6 +123,78 @@ export default function OrderOverviewPage() {
         );
     };
 
+    const handleSaveNewOrder = async () => {
+        // ❗ Validation: Check required fields
+        if (
+            !newOrder.customerId ||
+            !newOrder.consultantId ||
+            !newOrderService.serviceId ||
+            !newOrderService.fromAddress ||
+            !newOrderService.toAddress ||
+            !newOrderService.scheduleDate ||
+            !newOrderService.price
+        ) {
+            alert("❗ Please fill in all fields before saving.");
+            return;
+        }
+        try {
+            const orderResponse = await fetch("http://localhost:8080/orders", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    customerId: newOrder.customerId,
+                    consultantId: newOrder.consultantId,
+                    note: newOrder.note
+                })
+            });
+
+            const savedOrder = await orderResponse.json();
+
+            await fetch("http://localhost:8080/orderservicetypes", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    orderId: savedOrder.orderId,
+                    serviceId: newOrderService.serviceId,
+                    fromAddress: newOrderService.fromAddress,
+                    toAddress: newOrderService.toAddress,
+                    scheduleDate: newOrderService.scheduleDate,
+                    price: newOrderService.price
+                })
+            });
+
+            const [orderData, orderServiceData] = await Promise.all([
+                fetch("http://localhost:8080/orders").then((r) => r.json()),
+                fetch("http://localhost:8080/orderservicetypes").then((r) => r.json())
+            ]);
+
+            setOrders(orderData);
+            setOrderServiceTypes(orderServiceData);
+
+            setNewOrder({
+                orderId: 0,
+                customerId: customers[0]?.customerId ?? 0,
+                consultantId: consultants[0]?.consultantId ?? 0,
+                note: ""
+            });
+
+            setNewOrderService({
+                orderServiceTypeId: 0,
+                orderId: 0,
+                serviceId: serviceTypes[0]?.serviceId ?? 0,
+                fromAddress: "",
+                toAddress: "",
+                scheduleDate: "",
+                price: 0
+            });
+
+            alert("✅ Order saved!");
+        } catch (error) {
+            alert("❌ Failed to save order.");
+            console.error(error);
+        }
+    };
+
     // --- Return JSX (HTML structure) ---
     return (
         <div className="p-4">
@@ -128,29 +218,116 @@ export default function OrderOverviewPage() {
                     {/* --- "New" entry row (just a placeholder for future form) --- */}
                     <tr className="bg-yellow-50">
                         <td className="border p-2">New</td>
+
+                        {/* Customer dropdown */}
                         <td className="border p-2">
-                            <input type="text" placeholder="Customer name" className="border rounded p-1" />
+                            <select
+                                value={newOrder.customerId}
+                                onChange={(e) =>
+                                    setNewOrder({ ...newOrder, customerId: parseInt(e.target.value) })
+                                }
+                                className="border rounded p-1"
+                            >
+                                {customers.map((c) => (
+                                    <option key={c.customerId} value={c.customerId}>
+                                        {c.customerName}
+                                    </option>
+                                ))}
+                            </select>
                         </td>
+
+                        {/* Consultant dropdown */}
                         <td className="border p-2">
-                            <input type="text" placeholder="Consultant name" className="border rounded p-1" />
+                            <select
+                                value={newOrder.consultantId}
+                                onChange={(e) =>
+                                    setNewOrder({ ...newOrder, consultantId: parseInt(e.target.value) })
+                                }
+                                className="border rounded p-1"
+                            >
+                                {consultants.map((c) => (
+                                    <option key={c.consultantId} value={c.consultantId}>
+                                        {c.consultantName}
+                                    </option>
+                                ))}
+                            </select>
                         </td>
+
+                        {/* Service dropdown */}
                         <td className="border p-2">
-                            <input type="text" placeholder="Service" className="border rounded p-1" />
+                            <select
+                                value={newOrderService.serviceId}
+                                onChange={(e) =>
+                                    setNewOrderService({ ...newOrderService, serviceId: parseInt(e.target.value) })
+                                }
+                                className="border rounded p-1"
+                            >
+                                {serviceTypes.map((s) => (
+                                    <option key={s.serviceId} value={s.serviceId}>
+                                        {s.serviceName}
+                                    </option>
+                                ))}
+                            </select>
                         </td>
+
+                        {/* From address */}
                         <td className="border p-2">
-                            <input type="text" placeholder="From address" className="border rounded p-1" />
+                            <input
+                                type="text"
+                                value={newOrderService.fromAddress ?? ""}
+                                onChange={(e) =>
+                                    setNewOrderService({ ...newOrderService, fromAddress: e.target.value })
+                                }
+                                className="border rounded p-1"
+                            />
                         </td>
+
+                        {/* To address */}
                         <td className="border p-2">
-                            <input type="text" placeholder="To address" className="border rounded p-1" />
+                            <input
+                                type="text"
+                                value={newOrderService.toAddress ?? ""}
+                                onChange={(e) =>
+                                    setNewOrderService({ ...newOrderService, toAddress: e.target.value })
+                                }
+                                className="border rounded p-1"
+                            />
                         </td>
+
+                        {/* Date */}
                         <td className="border p-2">
-                            <input type="date" className="border rounded p-1" />
+                            <input
+                                type="date"
+                                value={newOrderService.scheduleDate ?? ""}
+                                onChange={(e) =>
+                                    setNewOrderService({ ...newOrderService, scheduleDate: e.target.value })
+                                }
+                                className="border rounded p-1"
+                            />
                         </td>
+
+                        {/* Price */}
                         <td className="border p-2">
-                            <input type="number" placeholder="Price" className="border rounded p-1" />
+                            <input
+                                type="number"
+                                value={newOrderService.price ?? ""}
+                                onChange={(e) =>
+                                    setNewOrderService({ ...newOrderService, price: parseFloat(e.target.value) })
+                                }
+                                className="border rounded p-1"
+                            />
                         </td>
+
+                        {/* Note */}
                         <td className="border p-2">
-                            <input type="text" placeholder="Note" className="border rounded p-1" />
+                            <input
+                                type="text"
+                                value={newOrder.note}
+                                onChange={(e) =>
+                                    setNewOrder({ ...newOrder, note: e.target.value })
+                                }
+                                className="border rounded p-1"
+                            />
                         </td>
                     </tr>
 
@@ -187,20 +364,108 @@ export default function OrderOverviewPage() {
                                 </td>
 
                                 {/* --- Consultant name on top, phone number below --- */}
+                                {/* --- Consultant dropdown + phone below in blue --- */}
                                 <td className="border p-2">
-                                    <div>{getConsultantName(order.consultantId).split(" (")[0]}</div>
-                                    <div className="text-blue-600 text-sm">
-                                        {getConsultantName(order.consultantId).split(" (")[1]?.replace(")", "")}
+                                    <select
+                                        value={order.consultantId}
+                                        onChange={(e) =>
+                                            handleFieldChange(order.orderId, "consultantId", parseInt(e.target.value))
+                                        }
+                                        className="border rounded p-1"
+                                    >
+                                        {consultants.map((c) => (
+                                            <option key={c.consultantId} value={c.consultantId}>
+                                                {c.consultantName}
+                                            </option>
+                                        ))}
+                                    </select>
+
+                                    <div className="mt-1 text-blue-600 text-sm">
+                                        {
+                                            consultants.find(c => c.consultantId === order.consultantId)
+                                                ?.consultantPhone ?? "No phone"
+                                        }
                                     </div>
                                 </td>
 
                                 {/* --- Service shown as read-only --- */}
                                 <td className="border p-2">
-                                    {orderService ? getServiceName(orderService.serviceId) : "-"}
+                                    {orderService ? (
+                                        <select
+                                            value={orderService.serviceId}
+                                            onChange={(e) => {
+                                                const newServiceId = parseInt(e.target.value);
+                                                setOrderServiceTypes((prev) =>
+                                                    prev.map((service) =>
+                                                        service.orderServiceTypeId === orderService.orderServiceTypeId
+                                                            ? { ...service, serviceId: newServiceId }
+                                                            : service
+                                                    )
+                                                );
+                                            }}
+                                            className="border rounded p-1"
+                                        >
+                                            {serviceTypes.map((s) => (
+                                                <option key={s.serviceId} value={s.serviceId}>
+                                                    {s.serviceName}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    ) : (
+                                        "-"
+                                    )}
                                 </td>
-                                <td className="border p-2">{orderService?.fromAddress ?? "-"}</td>
-                                <td className="border p-2">{orderService?.toAddress ?? "-"}</td>
-                                <td className="border p-2">{orderService?.scheduleDate ?? "-"}</td>
+                                <td className="border p-2">
+                                    <input
+                                        type="text"
+                                        value={orderService?.fromAddress ?? ""}
+                                        onChange={(e) => {
+                                            const newAddress = e.target.value;
+                                            setOrderServiceTypes((prev) =>
+                                                prev.map((service) =>
+                                                    service.orderServiceTypeId === orderService?.orderServiceTypeId
+                                                        ? { ...service, fromAddress: newAddress }
+                                                        : service
+                                                )
+                                            );
+                                        }}
+                                        className="border rounded p-1 w-full"
+                                    />
+                                </td>
+                                <td className="border p-2">
+                                    <input
+                                        type="text"
+                                        value={orderService?.toAddress ?? ""}
+                                        onChange={(e) => {
+                                            const newAddress = e.target.value;
+                                            setOrderServiceTypes((prev) =>
+                                                prev.map((service) =>
+                                                    service.orderServiceTypeId === orderService?.orderServiceTypeId
+                                                        ? { ...service, toAddress: newAddress }
+                                                        : service
+                                                )
+                                            );
+                                        }}
+                                        className="border rounded p-1 w-full"
+                                    />
+                                </td>
+                                <td className="border p-2">
+                                    <input
+                                        type="date"
+                                        value={orderService?.scheduleDate ?? ""}
+                                        onChange={(e) => {
+                                            const newDate = e.target.value;
+                                            setOrderServiceTypes((prev) =>
+                                                prev.map((service) =>
+                                                    service.orderServiceTypeId === orderService?.orderServiceTypeId
+                                                        ? { ...service, scheduleDate: newDate }
+                                                        : service
+                                                )
+                                            );
+                                        }}
+                                        className="border rounded p-1 w-full"
+                                    />
+                                </td>
                                 <td className="border p-2">
                                     {/* Editable price input field */}
                                     <input
@@ -233,6 +498,15 @@ export default function OrderOverviewPage() {
                     })}
                 </tbody>
             </table>
+
+            <button
+                onClick={handleSaveNewOrder}
+                className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            >
+                Save New Order
+            </button>
+
+
         </div>
     );
 }
