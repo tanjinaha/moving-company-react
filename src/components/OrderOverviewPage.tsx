@@ -2,6 +2,16 @@
 
 import { useEffect, useState } from "react";
 
+import { cn } from "@/lib/utils"
+import {
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
+} from "@/components/ui/popover";
+
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
 // --- Interfaces define the structure of data from backend tables ---
 interface Order {
     orderId: number;
@@ -42,6 +52,8 @@ export default function OrderOverviewPage() {
     const [consultants, setConsultants] = useState<SalesConsultant[]>([]);
     const [orderServiceTypes, setOrderServiceTypes] = useState<OrderServiceType[]>([]);
     const [serviceTypes, setServiceTypes] = useState<{ serviceId: number; serviceName: string }[]>([]);
+    // For tracking selected order IDs
+    const [selectedOrderIds, setSelectedOrderIds] = useState<number[]>([]);
 
     // ⬇️ ✅ Paste here:
     const [newOrder, setNewOrder] = useState<Order>({
@@ -212,7 +224,9 @@ export default function OrderOverviewPage() {
                         <th className="border p-2">Schedule Date</th>
                         <th className="border p-2">Price</th>
                         <th className="border p-2">Note</th>
+                        <th className="border p-2">Delete</th>
                     </tr>
+
                 </thead>
                 <tbody>
                     {/* --- "New" entry row (just a placeholder for future form) --- */}
@@ -234,6 +248,21 @@ export default function OrderOverviewPage() {
                                     </option>
                                 ))}
                             </select>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button variant="outline" size="sm" className="mt-1">
+                                        + Add Customer
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent>
+                                    <div className="flex flex-col space-y-2">
+                                        <Input placeholder="Name" />
+                                        <Input placeholder="Phone" />
+                                        <Input placeholder="Email" />
+                                        <Button>Add</Button>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
                         </td>
 
                         {/* Consultant dropdown */}
@@ -380,6 +409,22 @@ export default function OrderOverviewPage() {
                                         ))}
                                     </select>
 
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button variant="outline" size="sm" className="mt-1">
+                                                + Add Consultant
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent>
+                                            <div className="flex flex-col space-y-2">
+                                                <Input placeholder="Name" />
+                                                <Input placeholder="Phone" />
+                                                <Input placeholder="Email" />
+                                                <Button>Add</Button>
+                                            </div>
+                                        </PopoverContent>
+                                    </Popover>
+
                                     <div className="mt-1 text-blue-600 text-sm">
                                         {
                                             consultants.find(c => c.consultantId === order.consultantId)
@@ -492,6 +537,14 @@ export default function OrderOverviewPage() {
                                         onChange={(e) => handleFieldChange(order.orderId, "note", e.target.value)}
                                         className="border rounded p-1 w-full"
                                     />
+                                </td>
+                                <td className="border p-2">
+                                    <button
+                                        onClick={() => handleDeleteOrder(order.orderId)}
+                                        className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                                    >
+                                        Delete
+                                    </button>
                                 </td>
                             </tr>
                         );
