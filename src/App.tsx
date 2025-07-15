@@ -6,6 +6,8 @@ import SalesConsultantList from "./components/SalesConsultantList";
 import ServiceTypeList from "./components/ServiceTypeList";
 import PlaceOrderForm from "./components/PlaceOrderForm";
 import OrderOverviewPage from "./components/OrderOverviewPage";
+import CustomerSearch from "./components/CustomerSearch";
+import NewOrderForm from "./components/NewOrderForm";
 
 // This is your Home page with links to all main sections
 function Home() {
@@ -30,6 +32,8 @@ export default function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/new-order" element={<NewOrderForm />} />
+        <Route path="/search-customers" element={<CustomerSearch />} />
         <Route path="/" element={<Home />} />
         <Route path="/customers" element={<CustomerList />} />
         <Route path="/orders" element={<OrderList />} />
