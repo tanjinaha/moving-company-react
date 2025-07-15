@@ -22,7 +22,7 @@ function Home() {
         <Link to="/orders/details" className="block text-blue-600 underline">Order Details</Link>
         <Link to="/sales-consultants" className="block text-blue-600 underline">Sales Consultants</Link>
         <Link to="/service-types" className="block text-blue-600 underline">Service Types</Link>
-        <Link to="/place-order" className="block text-blue-600 underline">Place Order</Link>
+         <Link to="/new-order" className="block text-blue-600 underline">Create New Order</Link>
         <Link to="/overview" className="block text-blue-600 underline">Order Overview</Link>
       </nav>
     </div>
