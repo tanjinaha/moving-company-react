@@ -8,6 +8,8 @@ import PlaceOrderForm from "./components/PlaceOrderForm";
 import OrderOverviewPage from "./components/OrderOverviewPage";
 import CustomerSearch from "./components/CustomerSearch";
 import NewOrderForm from "./components/NewOrderForm";
+import CustomerListCards from "./components/CustomerListCards";
+import ConsultantListCards from "./components/ConsultantListCards";
 
 // This is your Home page with links to all main sections
 function Home() {
@@ -32,6 +34,7 @@ export default function App() {
   return (
     <Router>
       <Routes>
+        
         <Route path="/new-order" element={<NewOrderForm />} />
         <Route path="/search-customers" element={<CustomerSearch />} />
         <Route path="/" element={<Home />} />
@@ -42,6 +45,8 @@ export default function App() {
         <Route path="/service-types" element={<ServiceTypeList />} />
         <Route path="/place-order" element={<PlaceOrderForm />} />
         <Route path="/overview" element={<OrderOverviewPage />} />
+        <Route path="/customers/cards" element={<CustomerListCards />} />
+        <Route path="/consultants/cards" element={<ConsultantListCards />} />
       </Routes>
     </Router>
   );

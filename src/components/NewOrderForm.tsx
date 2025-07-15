@@ -29,21 +29,79 @@ export default function NewOrderForm() {
     const [price, setPrice] = useState(""); // 💰 Price of the service
     const [note, setNote] = useState(""); // 📝 Optional note for the order
 
+    // This function will run when the user clicks the Save Order button
+    const handleSaveOrder = async () => {
+        // Basic validation: check that important fields are filled
+        if (!customerName || !customerPhone || !consultantName || !serviceType || !fromAddress || !toAddress || !scheduleDate || !price) {
+            alert("Please fill in all required fields!");
+            return;
+        }
+
+        // Create a new object for the order
+        const newOrder = {
+            customerName,
+            customerPhone,
+            customerEmail,
+            consultantName,
+            consultantPhone,
+            consultantEmail,
+            serviceType,
+            fromAddress,
+            toAddress,
+            scheduleDate,
+            price,
+            note
+        };
+
+        try {
+            const response = await fetch("http://localhost:8080/orders", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newOrder)
+            });
+
+            if (response.ok) {
+                alert("✅ Order saved successfully!");
+                // Optional: clear the form after saving
+                setCustomerName("");
+                setCustomerPhone("");
+                setCustomerEmail("");
+                setConsultantName("");
+                setConsultantPhone("");
+                setConsultantEmail("");
+                setServiceType("");
+                setFromAddress("");
+                setToAddress("");
+                setScheduleDate("");
+                setPrice("");
+                setNote("");
+            } else {
+                alert("❌ Failed to save order. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error saving order:", error);
+            alert("❌ An error occurred while saving the order.");
+        }
+    };
+
+
     return (
         // Outer padding for spacing
         <div className="p-6">
 
             {/* Main container styled like a card (light blue background, rounded, etc.) */}
-            <Card className="bg-blue-50 border-blue-300">
+            <Card className="bg-blue-50 border-blue-300 max-w-6xl mx-auto p-6 shadow-md rounded-xl">
 
                 {/* Top part of the card: title + short text */}
                 <CardHeader>
-                    <CardTitle>🆕 Create New Order</CardTitle> {/* Big bold title */}
-                    <CardDescription>Fill in the details below to create a new order.</CardDescription> {/* Small subtitle */}
+                    <CardTitle className="text-2xl font-bold text-blue-900">🆕 Create New Order</CardTitle>
+                    <CardDescription className="text-gray-600">Fill in the details below to create a new order.</CardDescription>
                 </CardHeader>
 
                 {/* Middle part: we will put our input fields here (like customer name, price, etc.) */}
-                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
             // 👤 Customer Name Input Section
                     <div className="flex flex-col gap-1">
@@ -126,12 +184,18 @@ export default function NewOrderForm() {
                         <label htmlFor="serviceType" className="text-sm font-medium">
                             Service Type
                         </label>
-                        <Input
+                        <select
                             id="serviceType"
-                            placeholder="Enter service type (e.g., Moving, Packing)"
+                            className="border border-gray-300 rounded px-3 py-2"
                             value={serviceType}
                             onChange={(e) => setServiceType(e.target.value)}
-                        />
+                        >
+                            <option value="">-- Select Service Type --</option>
+                            <option value="MOVING">Moving</option>
+                            <option value="PACKING">Packing</option>
+                            <option value="CLEANING">Cleaning</option>
+                            <option value="CLEANING_DELUXE">Cleaning Deluxe</option>
+                        </select>
                     </div>
                     {/* 📦 From Address Input Section */}
                     <div className="flex flex-col gap-1">
@@ -202,9 +266,11 @@ export default function NewOrderForm() {
                 </CardContent>
 
                 {/* Bottom part: action buttons */}
-                <CardFooter className="flex justify-end gap-2">
-                    <Button variant="outline">Cancel</Button> {/* Outlined style */}
-                    <Button>Save Order</Button>              {/* Filled style */}
+                <CardFooter className="flex justify-end gap-4 mt-4">
+                    <Button variant="outline">Cancel</Button>
+                    <Button onClick={handleSaveOrder} className="bg-blue-600 hover:bg-blue-700 text-white">
+                        Save Order
+                    </Button>
                 </CardFooter>
             </Card>
         </div>

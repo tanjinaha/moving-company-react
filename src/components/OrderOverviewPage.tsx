@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 // Interfaces to match backend structure
 interface Order {
@@ -165,6 +166,14 @@ export default function OrderOverviewPage() {
     // --- Render table of orders ---
     return (
         <div className="p-4">
+            {/* Link to view all customers in a card layout */}
+            <Link to="/customers/cards">
+                <Button className="mb-4 bg-blue-600 text-white">View All Customers</Button>
+            </Link>
+            
+            <Link to="/consultants/cards">
+                <Button className="mb-4 bg-purple-600 text-white">View All Consultants</Button>
+            </Link>
             <table className="min-w-full border mt-4">
                 <thead>
                     <tr className="bg-gray-200">
