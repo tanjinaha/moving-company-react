@@ -22,8 +22,43 @@ export default function NewOrderForm() {
   const [note, setNote] = useState("");
 
   const handleSaveOrder = async () => {
-    // Validation skipped for brevity
+    const newOrder = {
+      customerName,
+      customerPhone,
+      customerEmail,
+      consultantName,
+      consultantPhone,
+      consultantEmail,
+      serviceType,
+      fromAddress,
+      toAddress,
+      scheduleDate,
+      price,
+      note,
+    };
+
+    try {
+      const response = await fetch("http://localhost:8080/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newOrder),
+      });
+
+      if (response.ok) {
+        alert("✅ Order saved successfully!");
+        // Optionally clear form
+        // setCustomerName(""); ... etc
+      } else {
+        const error = await response.text();
+        alert("❌ Failed to save order: " + error);
+      }
+    } catch (err) {
+      alert("⚠️ Error: " + err);
+    }
   };
+
 
   return (
     <div className="flex flex-col items-center p-8 bg-gray-100 min-h-screen">
