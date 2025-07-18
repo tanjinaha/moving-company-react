@@ -14,7 +14,7 @@ export default function NewOrderForm() {
   const [consultantName, setConsultantName] = useState("");
   const [consultantPhone, setConsultantPhone] = useState("");
   const [consultantEmail, setConsultantEmail] = useState("");
-  const [serviceType, setServiceType] = useState("");
+  const [serviceId, setserviceId] = useState("");
   const [fromAddress, setFromAddress] = useState("");
   const [toAddress, setToAddress] = useState("");
   const [scheduleDate, setScheduleDate] = useState("");
@@ -29,7 +29,7 @@ export default function NewOrderForm() {
       consultantName,
       consultantPhone,
       consultantEmail,
-      serviceType,
+      serviceId,
       fromAddress,
       toAddress,
       scheduleDate,
@@ -154,14 +154,14 @@ export default function NewOrderForm() {
               <label className="text-sm font-medium text-purple-700">Service Type</label>
               <select
                 className="w-full border border-gray-300 rounded px-3 py-2"
-                value={serviceType}
-                onChange={e => setServiceType(e.target.value)}
+                value={serviceId}
+                onChange={e => setserviceId(e.target.value)}
               >
                 <option value="">Select Service</option>
-                <option value="MOVING">Moving</option>
-                <option value="PACKING">Packing</option>
-                <option value="CLEANING">Cleaning</option>
-                <option value="CLEANING_DELUXE">Cleaning Deluxe</option>
+                <option value="1">Moving</option>
+                <option value="2">Packing</option>
+                <option value="3">Cleaning</option>
+                <option value="4">Cleaning Deluxe</option>
               </select>
             </div>
 
