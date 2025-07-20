@@ -7,35 +7,36 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from "@/components/ui/card"; // Shadcn UI Card components
-
+} from "@/components/ui/card";
 import { Link } from "react-router-dom";
 
-// 1. Define the structure of each consultant object
-interface SalesConsultant {
+// ✅ 1. Define the correct interface for Consultant
+interface Consultant {
   consultantId: number;
   consultantName: string;
   consultantPhone: number;
   consultantEmail: string;
 }
 
-// 2. This component shows all consultants in styled cards
+// ✅ 2. Main component to display all consultants in card layout
 export default function ConsultantListCards() {
-  const [consultants, setConsultants] = useState<SalesConsultant[]>([]); // Store consultants
+  const [consultants, setConsultants] = useState<Consultant[]>([]);
 
-  // 3. Fetch consultants from backend when component loads
+  // ✅ 3. Fetch consultants from the Spring Boot backend
   useEffect(() => {
-    fetch("http://localhost:8080/salesconsultants")
-      .then((r) => r.json())
-      .then((data) => setConsultants(data));
+    fetch("http://localhost:8080/consultants") // ✅ URL must match your @RequestMapping
+      .then((response) => response.json())
+      .then((data) => setConsultants(data))
+      .catch((error) => console.error("Error fetching consultants:", error));
   }, []);
 
+  // ✅ 4. UI rendering
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Page heading */}
+      {/* Page title */}
       <h2 className="text-3xl font-bold mb-6 text-center">All Consultants</h2>
 
-      {/* Link to return to Order Overview page */}
+      {/* Back link to overview */}
       <Link
         to="/overview"
         className="text-blue-600 underline mb-8 block text-center"
@@ -43,25 +44,25 @@ export default function ConsultantListCards() {
         ← Back to Order Overview
       </Link>
 
-      {/* Grid of cards, responsive: 1 column on small, 2 on medium, 3 on large screens */}
+      {/* Consultant cards grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {consultants.map((c) => (
+        {consultants.map((consultant) => (
           <Card
-            key={c.consultantId}
+            key={consultant.consultantId}
             className="bg-white border border-gray-300 shadow-xl rounded-xl p-6 hover:scale-[1.02] transition-transform"
           >
             <CardHeader>
               <CardTitle className="text-xl font-semibold">
-                {c.consultantName}
+                {consultant.consultantName}
               </CardTitle>
               <CardDescription className="text-sm text-muted-foreground">
-                ID: {c.consultantId}
+                ID: {consultant.consultantId}
               </CardDescription>
             </CardHeader>
 
             <CardContent className="space-y-2 pt-2">
-              <p className="text-base">📞 Phone: {c.consultantPhone}</p>
-              <p className="text-base">📧 Email: {c.consultantEmail}</p>
+              <p className="text-base">📞 Phone: {consultant.consultantPhone}</p>
+              <p className="text-base">📧 Email: {consultant.consultantEmail}</p>
             </CardContent>
           </Card>
         ))}

@@ -1,3 +1,5 @@
+// src/components/NewOrderForm.tsx
+
 import {
   Card,
   CardContent,
@@ -8,20 +10,27 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export default function NewOrderForm() {
+  // 🧾 Form input states
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [consultantName, setConsultantName] = useState("");
   const [consultantPhone, setConsultantPhone] = useState("");
   const [consultantEmail, setConsultantEmail] = useState("");
-  const [serviceId, setserviceId] = useState("");
+  const [serviceId, setserviceId] = useState<number | null>(null);
   const [fromAddress, setFromAddress] = useState("");
   const [toAddress, setToAddress] = useState("");
   const [scheduleDate, setScheduleDate] = useState("");
   const [price, setPrice] = useState("");
   const [note, setNote] = useState("");
 
+  // ✅ Handle Save button click
   const handleSaveOrder = async () => {
+    // Show confirmation popup
+    const confirm = window.confirm("Are you sure you want to save this order?");
+    if (!confirm) return; // user clicked "Cancel"
+
+    // Build the new order object to send to backend
     const newOrder = {
       customerName,
       customerPhone,
@@ -48,8 +57,7 @@ export default function NewOrderForm() {
 
       if (response.ok) {
         alert("✅ Order saved successfully!");
-        // Optionally clear form
-        // setCustomerName(""); ... etc
+        // Optionally clear form fields here if you want
       } else {
         const error = await response.text();
         alert("❌ Failed to save order: " + error);
@@ -59,6 +67,26 @@ export default function NewOrderForm() {
     }
   };
 
+  // ❌ Handle Cancel button click
+  const handleCancel = () => {
+    const confirm = window.confirm("Are you sure you want to cancel? All inputs will be lost.");
+    if (confirm) {
+      // Reset all fields
+      setCustomerName("");
+      setCustomerPhone("");
+      setCustomerEmail("");
+      setConsultantName("");
+      setConsultantPhone("");
+      setConsultantEmail("");
+      setserviceId(null);
+      setFromAddress("");
+      setToAddress("");
+      setScheduleDate("");
+      setPrice("");
+      setNote("");
+      alert("❌ Order canceled. All fields cleared.");
+    }
+  };
 
   return (
     <div className="flex flex-col items-center p-8 bg-gray-100 min-h-screen">
@@ -154,8 +182,8 @@ export default function NewOrderForm() {
               <label className="text-sm font-medium text-purple-700">Service Type</label>
               <select
                 className="w-full border border-gray-300 rounded px-3 py-2"
-                value={serviceId}
-                onChange={e => setserviceId(e.target.value)}
+                value={serviceId ?? ""}
+                onChange={e => setserviceId(Number(e.target.value))}
               >
                 <option value="">Select Service</option>
                 <option value="1">Moving</option>
@@ -232,8 +260,11 @@ export default function NewOrderForm() {
         </Card>
       </div>
 
+      {/* Buttons Section */}
       <div className="flex justify-end gap-4 mt-6 max-w-7xl w-full px-8">
-        <Button variant="outline">Cancel</Button>
+        <Button variant="outline" onClick={handleCancel}>
+          Cancel
+        </Button>
         <Button onClick={handleSaveOrder} className="bg-blue-600 hover:bg-blue-700 text-white">
           Save Order
         </Button>
