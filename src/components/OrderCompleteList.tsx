@@ -1,7 +1,8 @@
-// src/components/OrderDetailsList.tsx
+// src/components/OrderCompleteList.tsx
+
 import { useEffect, useState } from "react";
 
-// ✅ Type for one order row
+// This defines the structure of a complete order object
 interface OrderDetails {
   orderId: number;
   customerName: string;
@@ -14,12 +15,25 @@ interface OrderDetails {
   price: number;
 }
 
-export default function OrderDetailsList() {
+export default function OrderCompleteList() {
+  // All orders fetched from backend
   const [orders, setOrders] = useState<OrderDetails[]>([]);
+
+  // Filtered complete orders (not missing service/date/price)
+  const completeOrders = orders.filter(
+    (order) =>
+      order.serviceType !== "No service" &&
+      order.scheduleDate !== "1970-01-01" &&
+      order.price !== null
+  );
+
+  // Track which order is being edited
   const [editingOrderId, setEditingOrderId] = useState<number | null>(null);
+
+  // Track new input values when editing
   const [editedOrder, setEditedOrder] = useState<Partial<OrderDetails>>({});
 
-  // 🔄 Fetch all orders from backend once
+  // Fetch all order details from backend when page loads
   useEffect(() => {
     fetch("http://localhost:8080/orders/details")
       .then((res) => res.json())
@@ -27,12 +41,12 @@ export default function OrderDetailsList() {
       .catch((err) => console.error("❌ Error fetching order details:", err));
   }, []);
 
-  // 🔧 Handle changes to editable fields
+  // Handle input change during edit
   const handleChange = (field: keyof OrderDetails, value: any) => {
     setEditedOrder((prev) => ({ ...prev, [field]: value }));
   };
 
-  // 💾 Save edited order to backend
+  // Save changes to backend
   const handleSave = async (orderId: number) => {
     const confirm = window.confirm("💾 Are you sure you want to save the changes?");
     if (!confirm) return;
@@ -44,6 +58,7 @@ export default function OrderDetailsList() {
         body: JSON.stringify(editedOrder),
       });
 
+      // Update UI with new data
       setOrders((prev) =>
         prev.map((order) =>
           order.orderId === orderId ? { ...order, ...editedOrder } : order
@@ -58,7 +73,7 @@ export default function OrderDetailsList() {
     }
   };
 
-  // 🗑️ Delete order
+  // Delete order from backend
   const handleDelete = async (orderId: number) => {
     const confirm = window.confirm("🗑️ Are you sure you want to delete this order?");
     if (!confirm) return;
@@ -68,6 +83,7 @@ export default function OrderDetailsList() {
         method: "DELETE",
       });
 
+      // Remove from list in UI
       setOrders((prev) => prev.filter((o) => o.orderId !== orderId));
       alert("✅ Order deleted!");
     } catch (error) {
@@ -77,7 +93,7 @@ export default function OrderDetailsList() {
 
   return (
     <div className="p-6 max-w-screen-xl mx-auto">
-      <h2 className="text-3xl font-bold mb-6 text-center">📋 All Orders with Details</h2>
+      <h2 className="text-3xl font-bold mb-6 text-center">✅ Complete Orders Only</h2>
 
       <div className="overflow-x-auto">
         <table className="min-w-full border border-gray-300 bg-white">
@@ -95,16 +111,18 @@ export default function OrderDetailsList() {
               <th className="border px-3 py-2">Actions</th>
             </tr>
           </thead>
+
           <tbody>
-            {orders.map((order) => {
+            {completeOrders.map((order) => {
               const isEditing = editingOrderId === order.orderId;
+
               return (
                 <tr key={order.orderId} className="text-center border-t">
                   <td className="border px-2 py-2">{order.orderId}</td>
                   <td className="border px-2 py-2">{order.customerName}</td>
                   <td className="border px-2 py-2">{order.consultantName}</td>
 
-                  {/* Note */}
+                  {/* Editable Note */}
                   <td className="border px-2 py-2">
                     {isEditing ? (
                       <input
@@ -118,81 +136,33 @@ export default function OrderDetailsList() {
                     )}
                   </td>
 
-                  {/* ✅ ServiceType dropdown when editing */}
-                  <td className="border px-2 py-2">
-                    {isEditing ? (
-                      <select
-                        className="w-full border px-1 py-0.5 rounded"
-                        defaultValue={order.serviceType}
-                        onChange={(e) => handleChange("serviceType", e.target.value)}
-                      >
-                        <option value="MOVING">MOVING</option>
-                        <option value="PACKING">PACKING</option>
-                        <option value="CLEANING">CLEANING</option>
-                        <option value="DELUXE CLEANING">DELUXE CLEANING</option>
-                      </select>
-                    ) : (
-                      order.serviceType
-                    )}
-                  </td>
+                  <td className="border px-2 py-2">{order.serviceType}</td>
+                  <td className="border px-2 py-2">{order.fromAddress}</td>
+                  <td className="border px-2 py-2">{order.toAddress}</td>
 
-                  {/* From Address */}
-                  <td className="border px-2 py-2">
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        className="w-full border px-1 py-0.5 rounded"
-                        defaultValue={order.fromAddress}
-                        onChange={(e) => handleChange("fromAddress", e.target.value)}
-                      />
-                    ) : (
-                      order.fromAddress
-                    )}
-                  </td>
-
-                  {/* To Address */}
-                  <td className="border px-2 py-2">
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        className="w-full border px-1 py-0.5 rounded"
-                        defaultValue={order.toAddress}
-                        onChange={(e) => handleChange("toAddress", e.target.value)}
-                      />
-                    ) : (
-                      order.toAddress
-                    )}
-                  </td>
-
-                  {/* Schedule Date */}
+                  {/* ✅ Editable Schedule Date */}
                   <td className="border px-2 py-2">
                     {isEditing ? (
                       <input
                         type="date"
                         className="w-full border px-1 py-0.5 rounded"
-                        defaultValue={order.scheduleDate?.split("T")[0]}
-                        onChange={(e) => handleChange("scheduleDate", e.target.value)}
+                        defaultValue={
+                          order.scheduleDate
+                            ? order.scheduleDate.split("T")[0]
+                            : ""
+                        }
+                        onChange={(e) =>
+                          handleChange("scheduleDate", e.target.value)
+                        }
                       />
                     ) : (
                       new Date(order.scheduleDate).toLocaleDateString()
                     )}
                   </td>
 
-                  {/* Price */}
-                  <td className="border px-2 py-2">
-                    {isEditing ? (
-                      <input
-                        type="number"
-                        className="w-full border px-1 py-0.5 rounded"
-                        defaultValue={order.price}
-                        onChange={(e) => handleChange("price", parseFloat(e.target.value))}
-                      />
-                    ) : (
-                      `${order.price} kr`
-                    )}
-                  </td>
+                  <td className="border px-2 py-2">{order.price} kr</td>
 
-                  {/* Actions */}
+                  {/* Action Buttons */}
                   <td className="border px-2 py-2 space-x-2">
                     {isEditing ? (
                       <>

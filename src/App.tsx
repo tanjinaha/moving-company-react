@@ -10,8 +10,9 @@ import OrderOverviewPage from "./components/OrderOverviewPage";
 import CustomerSearch from "./components/CustomerSearch";
 import NewOrderForm from "./components/NewOrderForm";
 import CustomerListCards from "./components/CustomerListCards";
-import ConsultantList from "./components/ConsultantList";           // ✅ New List View
-import ConsultantListCards from "./components/ConsultantListCards"; // ✅ Card View
+import ConsultantList from "./components/ConsultantList";
+import ConsultantListCards from "./components/ConsultantListCards";
+import CompleteOrderList from "./components/CompleteOrderList"; // ✅ FIXED: Keep only this one
 
 // ✅ Home page with links to all sections
 function Home() {
@@ -24,7 +25,9 @@ function Home() {
 
         <Link to="/consultants" className="block text-blue-600 underline">Consultants (List View)</Link>
         <Link to="/consultants/cards" className="block text-blue-600 underline">Consultants (Card View)</Link>
+
         <Link to="/orders/details" className="block text-blue-600 underline">Order Details</Link>
+        <Link to="/orders/complete" className="block text-blue-600 underline">✅ Complete Orders (Read-Only)</Link> {/* ✅ FIXED HERE */}
 
         <Link to="/service-types" className="block text-blue-600 underline">Service Types</Link>
         <Link to="/new-order" className="block text-blue-600 underline">Create New Order</Link>
@@ -42,12 +45,10 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/customers" element={<CustomerList />} />
         <Route path="/customers/cards" element={<CustomerListCards />} />
-
         <Route path="/consultants" element={<ConsultantList />} />
         <Route path="/consultants/cards" element={<ConsultantListCards />} />
-
         <Route path="/orders/details" element={<OrderDetailsList />} />
-
+        <Route path="/orders/complete" element={<CompleteOrderList />} /> {/* ✅ FIXED: Keep only 1 route */}
         <Route path="/service-types" element={<ServiceTypeList />} />
         <Route path="/new-order" element={<NewOrderForm />} />
         <Route path="/place-order" element={<PlaceOrderForm />} />
